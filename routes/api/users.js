@@ -28,7 +28,7 @@ router.post(
     const { name, email, password } = req.body
 
     try {
-      const user = await User.findOne({ email })
+      let user = await User.findOne({ email })
 
       if (user) {
         res.status(400).json({ errors: [{ msg: 'User already exists' }] })
@@ -40,7 +40,7 @@ router.post(
         d: 'mm',
       })
 
-      const newUser = new User({
+      user = new User({
         name,
         email,
         avatar,
@@ -48,12 +48,12 @@ router.post(
       })
 
       const salt = await bcrypt.genSalt(10)
-      newUser.password = await bcrypt.hash(password, salt)
+      user.password = await bcrypt.hash(password, salt)
 
       await newUser.save()
 
       const payload = {
-        id: newUser.id,
+        id: user.id,
       }
 
       jwt.sign(
